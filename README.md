@@ -23,15 +23,11 @@ rules. Group Policy is how those rules get pushed out. This lab is where I pract
 ## Screenshots
 
 <p>
-  <img src="images/finance-vs-hr.png" width="720" alt="Finance user signs in and gets the F: drive; HR user signs in and does not">
-</p>
-<p>
-  <img src="images/02-gpmc-overview.png" width="300" alt="Group Policy Management with the five GPOs linked">&nbsp;&nbsp;
-  <img src="images/05-gpresult.png" width="400" alt="gpresult for an HR user: Finance Drive Map, Filtering: Denied (Security)">
+  <img src="images/readme-hero.png" width="720" alt="The rules in Group Policy Management; a Finance user gets the F: drive and an HR user does not; gpresult for the HR user shows Finance Drive Map, Filtering: Denied (Security)">
 </p>
 
-*The Finance drive reaches Finance and nobody else, and `gpresult` on the HR user says exactly why. Every milestone has a
-full screenshot in [`screenshots/`](screenshots/).*
+*The rule, the result, and the proof: the Finance drive reaches Finance and nobody else, and `gpresult` on the HR user says
+exactly why. Every milestone has a full screenshot in [`screenshots/`](screenshots/).*
 
 ## The network
 
