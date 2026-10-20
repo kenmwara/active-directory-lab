@@ -111,6 +111,19 @@ one piece on purpose and watch what changes.
   (`Set-DnsClient -RegisterThisConnectionsAddress $false`), or clients sometimes look for the domain controller on the
   wrong network.
 
+## By the numbers
+
+| Part | Lines | What it is |
+|---|---|---|
+| PowerShell that builds the lab | 89 | 46 in [`scripts/create-lab-vms.ps1`](scripts/create-lab-vms.ps1) (the Hyper-V switch and both VMs) and 43 in the code blocks of [`BUILD.md`](BUILD.md) (the domain, DNS, DHCP, NAT, OUs, groups and the domain join). The 999 users come from Josh Madakor's script, which isn't copied here (see Credits) |
+| Build guide ([`BUILD.md`](BUILD.md)) | 177 | every step, the commands I ran, and what breaks and why |
+| This README | 139 | |
+| Screenshots | 26 | one per milestone and per Group Policy proof, plus 5 composites in [`images/`](images/) |
+
+The five Group Policies were built in Group Policy Management, not in script. Behind this repo there is also a longer
+private Hyper-V guide (226 lines), the tooling that captured the screenshots and laid out the images (292 lines of
+PowerShell and Python), and the post drafts. All in: about 950 lines of text, 338 of them code, plus 66 images and PDFs.
+
 ## Build it yourself
 
 [BUILD.md](BUILD.md) has every step with the commands I ran, plus a table of what breaks and why.
