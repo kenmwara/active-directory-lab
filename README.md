@@ -1,3 +1,5 @@
+<!-- banner --><a href="https://github.com/kenmwara"><img src="https://raw.githubusercontent.com/kenmwara/kenmwara/main/assets/brand/card-ad-lab.png?v=38db5fc6" width="100%" alt="Active Directory Lab: A Windows Server 2025 domain controller and a domain-joined Windows 11 client on Hyper-V, with five Group Policies proven on the client. 999 users in the domain."></a>
+
 # Active Directory home lab
 
 A pretend company, running entirely on my own laptop. No cloud, fully on-premises: a **Windows Server 2025 domain
