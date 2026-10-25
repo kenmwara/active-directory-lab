@@ -118,12 +118,12 @@ one piece on purpose and watch what changes.
 ## The AI helpdesk agent (MCP)
 
 Since 24 October the lab has an AI helpdesk agent. It's Claude Code on CLIENT01, signed in to Windows as its own domain
-account, `KENLABi-operator`, and it can only use seven tools I wrote and connected over MCP (Model Context Protocol,
+account, `KENLAB\ai-operator`, and it can only use seven tools I wrote and connected over MCP (Model Context Protocol,
 the standard way AI tools plug into other systems). It can look people up, unlock an account, add someone to a group and
 disable an account.
 
 <p>
-  <img src="images/ai-agent-architecture.png" width="100%" alt="Architecture diagram. Inside the laptop, on the LabNet private switch: CLIENT01 runs Claude Code signed in as KENLABi-operator under admin-only managed settings, which starts the admcp MCP server over stdio. admcp has seven tools (four read, two change, ad_disable_account asks first) and runs one fixed PowerShell script per tool with JSON on stdin; the scripts reach DC01 over AD Web Services, TCP 9389, with Kerberos as ai-operator. DC01: AD delegation limits AI-Operators to users in _USERS and groups in Groups, the Security log records 4728, 4725, 4767 and 5136 by ai-operator, and a detector task reads it every 5 minutes. Claude, the model, is reached over HTTPS through DC01's NAT and has no route to AD. Three guards: AD decides what it may touch, a person approves what it can't undo, the DC keeps its own record.">
+  <img src="images/ai-agent-architecture.png" width="100%" alt="Architecture diagram. Inside the laptop, on the LabNet private switch: CLIENT01 runs Claude Code signed in as KENLAB\ai-operator under admin-only managed settings, which starts the admcp MCP server over stdio. admcp has seven tools (four read, two change, ad_disable_account asks first) and runs one fixed PowerShell script per tool with JSON on stdin; the scripts reach DC01 over AD Web Services, TCP 9389, with Kerberos as ai-operator. DC01: AD delegation limits AI-Operators to users in _USERS and groups in Groups, the Security log records 4728, 4725, 4767 and 5136 by ai-operator, and a detector task reads it every 5 minutes. Claude, the model, is reached over HTTPS through DC01's NAT and has no route to AD. Three guards: AD decides what it may touch, a person approves what it can't undo, the DC keeps its own record.">
 </p>
 
 **Where it lives**
