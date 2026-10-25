@@ -18,7 +18,9 @@ rules. Group Policy is how those rules get pushed out. This lab is where I pract
   account in `_ADMINS`.
 - **Group Policy:** password and lockout rules, Windows LAPS, a USB storage block, a Finance-only network drive, and
   logon auditing.
-- **Built:** 16 to 18 October 2026.
+- **AI helpdesk agent:** Claude Code on CLIENT01 with seven AD tools of my own over MCP, kept in line by AD
+  delegation, a confirmation step and DC01's own audit log ([section below](#the-ai-helpdesk-agent-mcp)).
+- **Built:** 16 to 18 October 2026; the agent 21 to 24 October.
 
 ---
 
@@ -113,14 +115,54 @@ one piece on purpose and watch what changes.
   (`Set-DnsClient -RegisterThisConnectionsAddress $false`), or clients sometimes look for the domain controller on the
   wrong network.
 
+## The AI helpdesk agent (MCP)
+
+Since 24 October the lab has an AI helpdesk agent. It's Claude Code on CLIENT01, signed in to Windows as its own domain
+account, `KENLABi-operator`, and it can only use seven tools I wrote and connected over MCP (Model Context Protocol,
+the standard way AI tools plug into other systems). It can look people up, unlock an account, add someone to a group and
+disable an account.
+
+<p>
+  <img src="images/ai-agent-architecture.png" width="100%" alt="Architecture diagram. Inside the laptop, on the LabNet private switch: CLIENT01 runs Claude Code signed in as KENLABi-operator under admin-only managed settings, which starts the admcp MCP server over stdio. admcp has seven tools (four read, two change, ad_disable_account asks first) and runs one fixed PowerShell script per tool with JSON on stdin; the scripts reach DC01 over AD Web Services, TCP 9389, with Kerberos as ai-operator. DC01: AD delegation limits AI-Operators to users in _USERS and groups in Groups, the Security log records 4728, 4725, 4767 and 5136 by ai-operator, and a detector task reads it every 5 minutes. Claude, the model, is reached over HTTPS through DC01's NAT and has no route to AD. Three guards: AD decides what it may touch, a person approves what it can't undo, the DC keeps its own record.">
+</p>
+
+**Where it lives**
+
+- **The MCP server, `admcp`, runs on CLIENT01 next to Claude Code.** Claude Code starts it as a child process and talks
+  to it over stdio, so it listens on no network port. It runs as the same `ai-operator` account and holds no passwords or
+  keys of its own.
+- **Each tool is one fixed PowerShell script.** The server hands the arguments over as JSON on stdin (the agent's text
+  never lands on a command line), the script checks every value and calls the ActiveDirectory module, which reaches DC01
+  over AD Web Services (TCP 9389) with `ai-operator`'s Kerberos ticket.
+- **The model is in the cloud, the tools aren't.** Claude Code sends prompts and tool results to Anthropic's API through
+  DC01's NAT. The model never gets a route to AD of its own.
+- **The code is written on the host** and copied into CLIENT01 with `Copy-VMFile`, so no Git credentials sit on the lab.
+
+**What keeps it in line (none of it is the model)**
+
+1. **AD decides what it may touch.** The group `AI-Operators` has write rights on users in `_USERS` and groups in
+   `Groups`, set with `dsacls`, and nothing else. Outside those, AD answers "Insufficient access rights to perform the
+   operation", and the agent gets that text word for word.
+2. **A person approves what it can't undo.** Claude Code asks me before every `ad_disable_account` call. Admin-only
+   managed settings load `admcp` and nothing else, and deny the shell and file writes.
+3. **DC01 keeps its own record.** Advanced Audit writes 4728 (added to group), 4725 (disabled), 4767 (unlocked) and 5136
+   (object changed) for every change, each one "by ai-operator", and a detector task reads them every 5 minutes.
+
+Setting it up was the first test. Asked to list every tool it had, the agent named 38, and only seven were mine: the rest
+came built into the program around it. Admin-only settings brought that down to 16. The first live run is the video in
+[this LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7519965993448849408/).
+
+The agent's code lives in a separate repo that stays private until the red-team campaign is done (instructions hidden in
+ordinary-looking user records, then blast-radius tests). It goes public with the findings.
+
 ## By the numbers
 
 | Part | Lines | What it is |
 |---|---|---|
 | PowerShell that builds the lab | 89 | 46 in [`scripts/create-lab-vms.ps1`](scripts/create-lab-vms.ps1) (the Hyper-V switch and both VMs) and 43 in the code blocks of [`BUILD.md`](BUILD.md) (the domain, DNS, DHCP, NAT, OUs, groups and the domain join). The 999 users come from Josh Madakor's script, which isn't copied here (see Credits) |
 | Build guide ([`BUILD.md`](BUILD.md)) | 177 | every step, the commands I ran, and what breaks and why |
-| This README | 139 | |
-| Screenshots | 26 | one per milestone and per Group Policy proof, plus 5 composites in [`images/`](images/) |
+| This README | 181 | |
+| Screenshots | 26 | one per milestone and per Group Policy proof, plus 5 composites and the agent diagram in [`images/`](images/) |
 
 The five Group Policies were built in Group Policy Management, not in script. Behind this repo there is also a longer
 private Hyper-V guide (226 lines), the tooling that captured the screenshots and laid out the images (292 lines of
