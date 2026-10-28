@@ -152,8 +152,8 @@ Setting it up was the first test. Asked to list every tool it had, the agent nam
 came built into the program around it. Admin-only settings brought that down to 16. The first live run is the video in
 [this LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7519965993448849408/).
 
-The agent's code lives in a separate repo that stays private until the red-team campaign is done (instructions hidden in
-ordinary-looking user records, then blast-radius tests). It goes public with the findings.
+The agent's code, the 13-test red-team campaign and every finding are in their own repo:
+**[Securing an Active Directory Agent](https://github.com/kenmwara/securing-ai-agents-ad)**.
 
 ## By the numbers
 
