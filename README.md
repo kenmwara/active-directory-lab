@@ -35,21 +35,8 @@ exactly why. Every milestone has a full screenshot in [`screenshots/`](screensho
 
 ## The network
 
-```
- Laptop (Windows 10 Pro, Hyper-V)
- ├── "Default Switch"  (Hyper-V's built-in NAT to the home internet)
- │        │
- │     [ DC01 ]  Windows Server 2025
- │      NIC 1 "INTERNET"  → Default Switch (automatic address)
- │      NIC 2 "LABNET"    → LabNet, static 172.16.0.1/24
- │      Roles: AD DS + DNS, DHCP, Routing (NAT)
- │        │
- └── "LabNet" private switch  (VMs only: no host, no internet of its own)
-          │
-       [ CLIENT01 ]  Windows 11 Enterprise
-        NIC → LabNet, address from DC01's DHCP (172.16.0.100–200),
-        internet through DC01's NAT, joined to ad.kenmwara.com
-```
+
+<img src="images/architecture.png" width="100%" alt="Architecture diagram of the AD home lab. One laptop running Windows 10 Pro and Hyper-V with two virtual switches. DC01, Windows Server 2025, has NIC 1 INTERNET on the Default Switch (the only way out of the lab) and NIC 2 LABNET at 172.16.0.1/24 on the LabNet private switch; it runs AD DS and DNS for ad.kenmwara.com (999 users in IT, Finance and HR OUs, an admin account apart in _ADMINS), DHCP for 172.16.0.100 to 200, and routing with NAT. CLIENT01, Windows 11 Enterprise, has one NIC on LabNet, gets its address, DNS and internet only through DC01, is joined to the domain, receives the Group Policies, and since 21 to 24 October hosts the AI helpdesk agent. LabNet admits only the two VMs, so the host can't reach them. The five Group Policies, each proven: password and lockout, Windows LAPS, USB storage block, the Finance-only F: drive by security filtering, and logon auditing.">
 
 ## What I built, step by step
 
