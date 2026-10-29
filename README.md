@@ -2,15 +2,15 @@
 
 # Active Directory Lab: Domain Build and Group Policy Hardening
 
-**On-premises Active Directory environment built on Hyper-V: a Windows Server 2025 domain controller, a domain-joined
-Windows 11 client, 999 users in a departmental OU structure, and five Group Policies, each verified on the client.**
+**A small company network, built from scratch on one laptop: a Windows server that manages 999 user accounts, a
+Windows 11 work PC, and five company security rules, each tested on the PC.**
 
-A two-VM domain was built on an isolated Hyper-V network to model a small organisation's identity infrastructure.
-DC01 provides AD DS, DNS, DHCP and NAT; CLIENT01 reaches the network and the internet only through DC01. Users were
-provisioned with PowerShell into IT, Finance and HR OUs with a security group per department, and an administrative
-account was kept separate in `_ADMINS`. Five Group Policies enforce password and lockout rules, local-administrator
-password rotation (Windows LAPS), removable-storage blocking, a department-scoped network drive, and logon auditing.
-Each policy was applied and verified on the target system.
+The lab copies how a small organisation runs its logins and computers. The server (DC01, Windows Server 2025) runs
+Active Directory, which holds every user account and checks every login; it also gives the PC its network address and
+is the PC's only way to the internet. Users were created in IT, Finance and HR departments, and the admin account was
+kept separate. Five Group Policies (company-wide rules) enforce strong passwords and account lockout, rotate the local
+admin password automatically (Windows LAPS), block USB storage, give only Finance staff a Finance drive, and record
+every login. Each rule was checked on the PC, with screenshots as proof.
 
 <img src="images/flow.png" width="100%" alt="How the lab works. Active Directory home lab · how it works A small company network, every rule tested 1A work PC joins the networkA Windows 11 PC on a private lab network, with no direct internet 2The server hands out the basicsThe main server gives it an address and name lookups, and is its only way to the internet 3A user signs inActive Directory checks the login (Windows Server 2025, 999 users) 4Company rules apply5 Group Policies: strong passwords and lockout, rotating admin passwords, USB sticks blocked, a Finance-only drive, login records 5Every login is recordedThe server logs each successful and failed sign-in IsolationThe PC can only reach the internet through the server Least privilegeAdmin account kept separate; only Finance sees the Finance drive VerificationEach rule checked on the PC, with screenshots as proof Built 16–18 Oct 2026 on one laptop: a server and a PC, 999 users, 3 departments, 5 Group Policies.github.com/kenmwara/active-directory-lab">
 
