@@ -32,6 +32,7 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 
 </details>
 
+
 ## The network in detail
 
 - **Host:** Windows 10 Pro, Hyper-V, two virtual machines on a private switch (LabNet) plus a NAT uplink on DC01 only.
@@ -65,6 +66,8 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 | 11 | Department OUs and security groups created; CLIENT01 moved to `Workstations` | [10](screenshots/10-ou-structure.png), [11](screenshots/11-client01-in-workstations.png) |
 | 12 | Five Group Policies created and linked | [12](screenshots/12-gpmc-overview.png) |
 
+</details>
+
 ## Problems found and fixed
 
 <img src="images/issues.png" width="100%" alt="Five problems hit during the build, and how each was fixed. Problem: The Finance drive didn't appear for Finance staff, and no error said why. Why: A targeting setting inside the rule was failing silently. Fix: Removed it and limited the whole rule to the Finance group, with one read permission Windows needs. Finance gets the drive; HR is refused. Problem: Installing the rotating admin password feature (LAPS) failed: 'insufficient access rights'. Why: That change needs Schema Admins rights, a level above Domain Admins, and new rights only count after signing in again. Fix: Added the admin to Schema Admins, then signed out and back in. Problem: Company users couldn't sign in through the laptop's window into the PC. Why: That window counts as a remote-desktop login. Fix: Allowed company users to use remote desktop on the PC. Problem: The PC sometimes looked for the server on the wrong network. Why: The server published its internet-side address in the company directory too. Fix: Told that connection not to publish its address. Problem: A virtual computer wouldn't start from the install disk. Why: The 'press any key' prompt gives up after about 5 seconds. Fix: Restarted it and pressed a key straight away.">
@@ -78,6 +81,8 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 | Domain users denied sign-in through Hyper-V Enhanced Session | Enhanced Session is a Remote Desktop sign-in | `KENLAB\Domain Users` added to CLIENT01's local Remote Desktop Users group |
 | Clients intermittently located the domain controller on the wrong network | DC01's internet-facing adapter registered in the domain's DNS | `Set-DnsClient -RegisterThisConnectionsAddress $false` on that adapter |
 | VM failed to boot from installation media | The "Press any key to boot from CD" prompt times out in about 5 seconds | VM reset and the prompt answered immediately |
+
+</details>
 
 ## Related work: AI helpdesk agent
 
@@ -95,9 +100,7 @@ DC01's audit log. Its design, 13-test security assessment and findings are docum
 | [`screenshots/`](screenshots/) | Evidence for every milestone and policy |
 | [`images/`](images/) | Flow, architecture and composite images |
 
-</details>
 
-</details>
 
 **Third-party components:** user provisioning used the public script
 [joshmadakor1/AD_PS](https://github.com/joshmadakor1/AD_PS) (not copied here). The base topology adapts a public home-lab
