@@ -1,6 +1,6 @@
 # Build guide: Active Directory on Hyper-V (Windows Server 2025 + Windows 11)
 
-The steps I followed, with the commands I ran. Every value below is the one this lab uses; pick your own, but stay
+The build steps and the commands used. Every value below is the one this lab uses; pick your own, but stay
 consistent.
 
 | Item | Value |
