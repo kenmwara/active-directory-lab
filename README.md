@@ -16,7 +16,11 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 
 **Status:** complete (built 16 to 18 October 2026). Build guide: [BUILD.md](BUILD.md).
 
-## Group Policy results
+## The five company rules
+
+<img src="images/rules.png" width="100%" alt="Five company rules, each tested on the work PC. Group Policies are rules the server pushes to every computer and user. Each one was switched on, then checked. Strong passwords: At least 14 characters, and the last 24 can't be reused. Five wrong tries lock the account for 15 minutes. Proof: A test account really did lock after five wrong tries. Rotating admin password: The PC's local admin password changes on its own and is stored safely on the server (Windows LAPS). Proof: The server shows a freshly rotated password, hidden in the screenshot. USB sticks blocked: No USB drives or other removable storage on work PCs. Proof: The PC's settings show the block switched on. Finance-only drive: Finance staff get the Finance drive. Nobody else does. Proof: A Finance user gets the drive; an HR user doesn't, and Windows' own report says why. Every login recorded: The server logs each successful and failed sign-in. Proof: Both kinds of sign-in show up in the server's security log. Screenshot: Only Finance staff get the Finance drive. HR doesn't, and Windows' own report shows why.">
+
+<details><summary>The rules as a table, with links to every screenshot</summary>
 
 | GPO | Scope | Control | Verification |
 |---|---|---|---|
@@ -26,13 +30,9 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 | Finance drive map | `_USERS`, security-filtered to Finance | Maps `\\DC01\Finance` as `F:` | Finance user receives `F:`; HR user does not; `gpresult` reports *Denied (Security)*: [17](screenshots/17-finance-gets-F.png), [18](screenshots/18-hr-no-F.png), [20](screenshots/20-gpresult.png) |
 | Logon auditing | `Domain Controllers` | Advanced Audit Policy: Logon, success and failure | Event IDs 4624 and 4625 in DC01's Security log: [19](screenshots/19-logon-audit-4624-4625.png) |
 
-<p>
-  <img src="images/readme-hero.png" width="720" alt="The Group Policy Management console; a Finance user receives the F: drive and an HR user does not; gpresult for the HR user shows Finance Drive Map, Filtering: Denied (Security)">
-</p>
+</details>
 
-*Department-scoped drive mapping: the policy, the result for each department, and the `gpresult` evidence.*
-
-## Environment and scope
+## The network in detail
 
 - **Host:** Windows 10 Pro, Hyper-V, two virtual machines on a private switch (LabNet) plus a NAT uplink on DC01 only.
 - **DC01:** Windows Server 2025. Forest `ad.kenmwara.com` (NetBIOS `KENLAB`, Windows2025Domain functional level);
@@ -42,9 +42,13 @@ every login. Each rule was checked on the PC, with screenshots as proof.
   `_USERS\Finance`, `_USERS\HR`, one security group per department, administrative account in `_ADMINS`.
 - **Out of scope:** production systems; all accounts exist only on the isolated lab network.
 
-<img src="images/architecture.png" width="100%" alt="Detailed network diagram. One laptop running Windows 10 Pro and Hyper-V with two virtual switches. DC01 has NIC 1 on the Default Switch (the only route out of the lab) and NIC 2 at 172.16.0.1/24 on the LabNet private switch; it runs AD DS and DNS for ad.kenmwara.com, DHCP for 172.16.0.100 to 200, and NAT. CLIENT01 has one NIC on LabNet and receives its address, DNS and internet access through DC01. LabNet admits only the two VMs. The five Group Policies are listed with their verification.">
+<img src="images/architecture.png" width="100%" alt="The lab network: a small office network on one laptop, with one way in and out. Two virtual computers run on one laptop: a server (DC01, Windows Server 2025) and a work PC (CLIENT01, Windows 11). The PC has no internet of its own, so everything it does goes through the server. The server runs Active Directory with 999 users in IT, Finance and HR, gives the PC its address and name lookups, and is the only way to the internet. The PC receives the five company rules, each checked with a screenshot, and later an AI IT helper tested in its own project. The five rules: strong passwords and lockout, a rotating admin password (Windows LAPS), USB sticks blocked, a Finance-only drive, and every login recorded.">
 
-## Build milestones
+## How it was built
+
+<img src="images/build.png" width="100%" alt="Built in three days, step by step. 16 to 18 October 2026. Every step has a screenshot as proof (listed below the diagram). Phase 1, Set up the machines: Created the private network and both virtual computers with one script; Named the server and gave it a fixed address. Phase 2, Build the directory: Turned the server into a domain controller for ad.kenmwara.com; Created a separate admin account; Switched on automatic network addresses; Added 999 users with a script. Phase 3, Connect the work PC: Shared the server's internet connection with the lab; The PC got its address from the server; The PC joined the company network and a user signed in; Checked the PC's internet runs through the server. Phase 4, Organise and apply rules: Created the IT, Finance and HR departments and groups; moved the PC into Workstations; Created and switched on the five company rules.">
+
+<details><summary>Every step, with its screenshot</summary>
 
 | # | Milestone | Evidence |
 |---|---|---|
@@ -61,7 +65,11 @@ every login. Each rule was checked on the PC, with screenshots as proof.
 | 11 | Department OUs and security groups created; CLIENT01 moved to `Workstations` | [10](screenshots/10-ou-structure.png), [11](screenshots/11-client01-in-workstations.png) |
 | 12 | Five Group Policies created and linked | [12](screenshots/12-gpmc-overview.png) |
 
-## Issues identified and resolved
+## Problems found and fixed
+
+<img src="images/issues.png" width="100%" alt="Five problems hit during the build, and how each was fixed. Problem: The Finance drive didn't appear for Finance staff, and no error said why. Why: A targeting setting inside the rule was failing silently. Fix: Removed it and limited the whole rule to the Finance group, with one read permission Windows needs. Finance gets the drive; HR is refused. Problem: Installing the rotating admin password feature (LAPS) failed: 'insufficient access rights'. Why: That change needs Schema Admins rights, a level above Domain Admins, and new rights only count after signing in again. Fix: Added the admin to Schema Admins, then signed out and back in. Problem: Company users couldn't sign in through the laptop's window into the PC. Why: That window counts as a remote-desktop login. Fix: Allowed company users to use remote desktop on the PC. Problem: The PC sometimes looked for the server on the wrong network. Why: The server published its internet-side address in the company directory too. Fix: Told that connection not to publish its address. Problem: A virtual computer wouldn't start from the install disk. Why: The 'press any key' prompt gives up after about 5 seconds. Fix: Restarted it and pressed a key straight away.">
+
+<details><summary>The problems as a table, with the technical detail</summary>
 
 | Issue | Root cause | Resolution |
 |---|---|---|
@@ -86,6 +94,10 @@ DC01's audit log. Its design, 13-test security assessment and findings are docum
 | [`scripts/create-lab-vms.ps1`](scripts/create-lab-vms.ps1) | Creates the Hyper-V switch and both VMs |
 | [`screenshots/`](screenshots/) | Evidence for every milestone and policy |
 | [`images/`](images/) | Flow, architecture and composite images |
+
+</details>
+
+</details>
 
 **Third-party components:** user provisioning used the public script
 [joshmadakor1/AD_PS](https://github.com/joshmadakor1/AD_PS) (not copied here). The base topology adapts a public home-lab
